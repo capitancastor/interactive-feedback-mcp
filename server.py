@@ -70,4 +70,12 @@ def interactive_feedback(
     return launch_feedback_ui(first_line(project_directory), first_line(summary))
 
 if __name__ == "__main__":
-    mcp.run(transport="stdio")
+    try:
+        mcp.run(transport="stdio")
+    except KeyboardInterrupt:
+        sys.exit(0)
+    except BaseException:
+        # BrokenResourceError / ExceptionGroup from client disconnect
+        # is expected when Cursor cancels a request or the pipe closes.
+        # Exit cleanly so Cursor can restart the server.
+        sys.exit(0)
